@@ -1,0 +1,5 @@
+
+# 
+#*.cpython-311.pyc
+#all enviroment files
+*\env
