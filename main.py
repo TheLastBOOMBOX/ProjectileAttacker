@@ -8,7 +8,7 @@ class ProjectileAttacker(): # co-ordinates the other functions.
         
 class Vidstream(): # class that controls how the video capture is utilised by everything else
     def __init__(self) -> None:
-        self.vidStream = cv.VideoCapture(1) #vidStream is the video CVideoCapture, the value 1 indicates the external camera
+        self.vidStream = cv.VideoCapture(0) #vidStream is the video CVideoCapture, the value 1 indicates the external camera
         if not self.vidStream.isOpened():
             print("Camera not opened, check if turret is attached")
             exit()
@@ -19,12 +19,23 @@ class Vidstream(): # class that controls how the video capture is utilised by ev
             if not self.webcamOn: # if webcam is not on (for whatever reason)
                 print("Error, Frame not captured")
                 break
+            feed = self.displayStream() # What the user sees
+            if feed == False:
+                self.endStream()
+                break
             
-    def displayStream(self):
+    def displayStream(self): #displays camera feed to user so they understand what the computer sees
         cv.imshow("frame", self.frame) # create window with the title frame, that shows the webcam capture immediatle
-        next = cv.waitKey(1)
+        command = cv.waitKey(1) # waits 1 milisecond for user input, else moves on
+        if command == ord("q"): # checks if user wants to end 
+            return False
+        
     def frame(self):
         pass
+    def endStream(self):
+        self.vidStream.release() #Release the VideoCapture 
+        cv.destroyAllWindows()
+
         
     def speed(self,target): # Defines capture rate of the program. difers between resting, prediction and movement and 
         pass
@@ -46,3 +57,5 @@ class HitDetection(): # uses other functions and user nput to determine if and h
     pass
 class UserInput(): # allows user to manually control and override turret actions
     pass
+Test = Vidstream()
+Test.stream()
