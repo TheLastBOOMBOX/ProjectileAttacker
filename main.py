@@ -1,6 +1,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import cv2 as cv
+import Glare
 class ProjectileAttacker(): # co-ordinates the other functions.
     def __init__(self, vidStream, mask) -> None:
         #self.
@@ -15,23 +16,34 @@ class Vidstream(): # class that controls how the video capture is utilised by ev
 
     def stream(self):
         while True:
-            self.webcamOn, self.frame = self.vidStream.read()   
+            self.webcamOn, self.capture = self.vidStream.read()   
             if not self.webcamOn: # if webcam is not on (for whatever reason)
                 print("Error, Frame not captured")
                 break
+            self.frame()
             feed = self.displayStream() # What the user sees
             if feed == False:
                 self.endStream()
                 break
             
     def displayStream(self): #displays camera feed to user so they understand what the computer sees
-        cv.imshow("frame", self.frame) # create window with the title frame, that shows the webcam capture immediatle
+        cv.imshow("frame", self.capture) # create window with the title frame, that shows the webcam capture immediatle
+        command = cv.waitKey(1) # waits 1 milisecond for user input, else moves on
+        if command == ord("q"): # checks if user wants to end 
+            return False
+        cv.imshow("guassian", self.guassianFrame) # create window with the title frame, that shows the webcam capture immediatle
         command = cv.waitKey(1) # waits 1 milisecond for user input, else moves on
         if command == ord("q"): # checks if user wants to end 
             return False
         
     def frame(self):
-        pass
+        self.medianFrame = cv.medianBlur(self.capture, 3)
+        self.guassianFrame = cv.GaussianBlur(self.medianFrame, (5,5),0,0) 
+        self.finalBlur = cv.medianBlur(self.guassianFrame, 5)
+        return self.finalBlur
+
+        
+
     def endStream(self):
         self.vidStream.release() #Release the VideoCapture 
         cv.destroyAllWindows()
